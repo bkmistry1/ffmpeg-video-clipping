@@ -13,7 +13,7 @@ pathName = os.getenv("pathName")
 outputPath = os.getenv("outputPath")
 
 
-with open(fileName, 'r') as file:
+with open(fileName, 'r', encoding="utf-8-sig") as file:
     for line in file.readlines():
 
         videoDetails = line.split(",")
@@ -22,7 +22,7 @@ with open(fileName, 'r') as file:
         timeStart: str = videoDetails[1]
         timeEnd: str = videoDetails[2]
         titleOfOutputFile = videoDetails[3].strip()
-        titleOfOutputFile = pathName + "\\" + titleOfOutputFile.removesuffix("\n")
+        titleOfOutputFile = outputPath + "\\" + titleOfOutputFile.removesuffix("\n")
 
         timeStart = timeStart.strip()
         timeEnd = timeEnd.strip()
