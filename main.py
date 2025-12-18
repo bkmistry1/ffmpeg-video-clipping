@@ -102,16 +102,12 @@ async def main():
                         p = subprocess.Popen(command, stdin=subprocess.PIPE)
                         p.wait()
 
-            newCsvFileName = csvFile.parent / Path("done-" + csvFile.name)
-            try:
-                print("renaming")
-                os.rename(str(csvFile), newCsvFileName)
-                print(str(csvFile))
-                print(str(newCsvFileName))
-                newCsvFileName = ""
-            except Exception as e:
-                print(e)
-                print("renaming failed")
+            
+            tmpCsvFileName = csvFile.parent / Path("r" + csvFile.name)
+            newCsvFileName = csvFile.parent / Path("done-" + tmpCsvFileName.name)
+
+            os.rename(str(csvFile), tmpCsvFileName)
+            os.rename(str(tmpCsvFileName), str(newCsvFileName))
 
         await asyncio.sleep(5)
 
