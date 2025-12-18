@@ -103,8 +103,19 @@ async def main():
                         p.wait()
         
             newCsvFileName = csvFile.parent / f"done-{csvFile.name}"
-            os.replace(csvFile, newCsvFileName)
-            print(f"Renamed {csvFile} -> {newCsvFileName}")
+            # os.replace(csvFile, newCsvFileName)
+            # print(f"Renamed {csvFile} -> {newCsvFileName}")
+
+            try:
+                os.replace(csvFile, newCsvFileName)   # or os.rename
+                print(f"Renamed {csvFile} -> {newCsvFileName}")
+            except FileNotFoundError as e:
+                print(f"File not found: {e}")
+            except PermissionError as e:
+                print(f"Permission denied (file may be locked): {e}")
+            except OSError as e:
+                print(f"OS error during rename: {e}")
+
 
         await asyncio.sleep(5)
 
