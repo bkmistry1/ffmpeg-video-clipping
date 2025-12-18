@@ -104,7 +104,7 @@ async def main():
                         p.wait()
         
             newCsvFileName = csvFile.parent / f"done-{csvFile.name}"
-            shutil.move(csvFile, newCsvFileName)      
+            os.rename(csvFile, newCsvFileName)      
 
 
         await asyncio.sleep(5)
