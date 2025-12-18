@@ -1,5 +1,8 @@
 import subprocess
 import os 
+import glob
+
+from pathlib import Path
 
 from datetime import datetime
 
@@ -7,49 +10,87 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-fileName = input("Name of csv file")
-
-pathName = os.getenv("pathName")
-outputPath = os.getenv("outputPath")
+rootPath = os.getenv("rootPath")
 
 
-with open(fileName, 'r', encoding="utf-8-sig") as file:
-    for line in file.readlines():
+# set the current working directory
 
-        videoDetails = line.split(",")
+cwd = Path(rootPath)
 
-        titleOfVideoFile = pathName + "\\" + videoDetails[0]
-        timeStart: str = videoDetails[1]
-        timeEnd: str = videoDetails[2]
-        titleOfOutputFile = videoDetails[3].strip()
-        titleOfOutputFile = outputPath + "\\" + titleOfOutputFile.removesuffix("\n")
+# traverse through all directories looking for clips.csv files
+csvFilesOnly = "*clips*.csv"
 
-        timeStart = timeStart.strip()
-        timeEnd = timeEnd.strip()
-        titleOfVideoFile = titleOfVideoFile.strip()
-        titleOfOutputFile = titleOfOutputFile.strip()
+allCsvFiles = list(cwd.rglob(csvFilesOnly))
 
-        timeStart = datetime.strptime(timeStart, "%H:%M:%S")
-        timeEnd = datetime.strptime(timeEnd, "%H:%M:%S")
+# read csv file and check if it fits in the four headers
+# nameOfFile,startTime,endTime,nameOfClip
 
-        timeDifference = timeEnd - timeStart        
+for csvFile in allCsvFiles:
+    # print(csvFile.parent)
+    # print(csvFile.name)
 
-        commandString = f"ffmpeg -ss {videoDetails[1].strip()} -i {titleOfVideoFile} -t {timeDifference.seconds} -c:v libx264 -preset slow -c:a copy {titleOfOutputFile}"
+    parentDirectory = csvFile.parent
 
-        tmpCommand = commandString.split(" ")
+    with open(csvFile, 'r', encoding="utf-8-sig") as file:
+        for line in file.readlines():
 
-        print(commandString)
+            videoDetails = line.split(",")
 
-        command = []
-        for item in tmpCommand:
-            tmpItem = item
-            if ("%20" in item):
-                tmpItem = item.replace("%20", " ")
+            if(len(videoDetails) == 4):
 
-            command.append(tmpItem)
+                titleOfVideoFile = parentDirectory / videoDetails[0]
+                timeStart: str = videoDetails[1]
+                timeEnd: str = videoDetails[2]
+                titleOfOutputFile = videoDetails[3].strip()
+                titleOfOutputFile = titleOfOutputFile.strip("\n")
+                titleOfOutputFile = parentDirectory / titleOfOutputFile
+                
+                titleOfVideoFile = str(titleOfVideoFile).replace(" ", "%20")
+                titleOfOutputFile = str(titleOfOutputFile).replace(" ", "%20")
+                print(titleOfVideoFile)
+                print(titleOfOutputFile)
+
+                timeStart = timeStart.strip()
+                timeEnd = timeEnd.strip()
+
+                timeStartDateTime = datetime.strptime(timeStart, "%H:%M:%S")
+                timeEndDateTime = datetime.strptime(timeEnd, "%H:%M:%S")
+
+                timeDifference = timeEndDateTime - timeStartDateTime
+
+                # print(timeStart)
+                # print(timeEnd)
+                # print(timeDifference)
+
+                # begin creating the clips  
+
+                commandString = f"ffmpeg -n -ss {timeStart} -i {titleOfVideoFile} -t {timeDifference.seconds} -c:v libx264 -preset slow -c:a aac {titleOfOutputFile}"
+                # [
+                #     'ffmpeg',
+                #     '-y',
+                #     '-ss', '0:04:00',
+                #     '-i', '\\\\mistrysharenas.localdomain\\Church\\Next Gen\\Next Gen Peace Cup\\2025-11-23\\MainCam\\C0007.MP4',
+                #     '-t', '12',
+                #     '-c:v', 'libx264',
+                #     '-preset', 'slow',
+                #     '-c:a', 'aac',
+                #     '-b:a', '192k',
+                #     '\\\\mistrysharenas.localdomain\\Church\\Next Gen\\Next Gen Peace Cup\\2025-11-23\\MainCam\\oop.mp4'
+                # ]
+                tmpCommand = commandString.split(" ")
+
+                print(commandString)
+
+                command = []
+                for item in tmpCommand:
+                    tmpItem = item
+                    if ("%20" in item):
+                        tmpItem = item.replace("%20", " ")
+
+                    command.append(tmpItem)
 
 
-        print(command)
+                print(command)
 
-        p = subprocess.Popen(command, stdin=subprocess.PIPE)
-        p.wait()
+                p = subprocess.Popen(command, stdin=subprocess.PIPE)
+                p.wait()
