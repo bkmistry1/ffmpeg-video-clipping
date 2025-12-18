@@ -106,6 +106,8 @@ async def main():
             try:
                 print("renaming")
                 os.rename(str(csvFile), newCsvFileName)
+                print(str(csvFile))
+                print(str(newCsvFileName))
             except Exception as e:
                 print(e)
                 print("renaming failed")
