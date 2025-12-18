@@ -101,13 +101,10 @@ async def main():
 
                         p = subprocess.Popen(command, stdin=subprocess.PIPE)
                         p.wait()
+        
+            newCsvFileName = csvFile.parent / Path("done-" + csvFile.name)
 
-            
-            tmpCsvFileName = csvFile.parent / Path("r" + csvFile.name)
-            newCsvFileName = csvFile.parent / Path("done-" + tmpCsvFileName.name)
-
-            os.rename(str(csvFile), tmpCsvFileName)
-            os.rename(str(tmpCsvFileName), str(newCsvFileName))
+            os.replace(str(csvFile), str(newCsvFileName))
 
         await asyncio.sleep(5)
 
