@@ -94,3 +94,6 @@ for csvFile in allCsvFiles:
 
                 p = subprocess.Popen(command, stdin=subprocess.PIPE)
                 p.wait()
+
+    newCsvFileName = csvFile.parent / Path("done-" + csvFile.name)
+    os.rename(str(csvFile), newCsvFileName)
