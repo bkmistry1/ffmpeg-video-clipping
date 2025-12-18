@@ -103,7 +103,10 @@ async def main():
                         p.wait()
 
             newCsvFileName = csvFile.parent / Path("done-" + csvFile.name)
-            os.rename(str(csvFile), newCsvFileName)
+            try:
+                os.rename(str(csvFile), newCsvFileName)
+            except Exception as e:
+                print(e)
 
         await asyncio.sleep(5)
 
