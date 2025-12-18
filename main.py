@@ -18,7 +18,7 @@ rootPath = os.getenv("rootPath")
 cwd = Path(rootPath)
 
 # traverse through all directories looking for clips.csv files
-csvFilesOnly = "*clips*.csv"
+csvFilesOnly = "clips.csv"
 
 allCsvFiles = list(cwd.rglob(csvFilesOnly))
 
