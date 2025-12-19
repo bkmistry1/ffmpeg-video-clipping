@@ -13,22 +13,26 @@ from dotenv import load_dotenv
 load_dotenv()
 
 rootPath = os.getenv("rootPath")
+encoder = os.getenv("encoder")
 
+# find all directories
 
-# set the current working directory
-
-cwd = Path(rootPath)
+rootPaths = rootPath.split(",")
 
 # traverse through all directories looking for clips.csv files
+
 csvFilesOnly = "clips.csv"
-
-
 
 async def main():    
 
     while(1):
-        print("running")
-        allCsvFiles = list(cwd.rglob(csvFilesOnly))
+        print("running")        
+
+        allCsvFiles = []
+
+        for path in rootPaths:
+            cwd = Path(path)
+            allCsvFiles.extend(list(cwd.rglob(csvFilesOnly)))        
 
         # read csv file and check if it fits in the four headers
         # nameOfFile,startTime,endTime,nameOfClip
@@ -66,25 +70,10 @@ async def main():
 
                         timeDifference = timeEndDateTime - timeStartDateTime
 
-                        # print(timeStart)
-                        # print(timeEnd)
-                        # print(timeDifference)
-
                         # begin creating the clips  
 
-                        commandString = f"ffmpeg -n -ss {timeStart} -i {titleOfVideoFile} -t {timeDifference.seconds} -c:v libx264 -preset slow -c:a aac {titleOfOutputFile}"
-                        # [
-                        #     'ffmpeg',
-                        #     '-y',
-                        #     '-ss', '0:04:00',
-                        #     '-i', '\\\\mistrysharenas.localdomain\\Church\\Next Gen\\Next Gen Peace Cup\\2025-11-23\\MainCam\\C0007.MP4',
-                        #     '-t', '12',
-                        #     '-c:v', 'libx264',
-                        #     '-preset', 'slow',
-                        #     '-c:a', 'aac',
-                        #     '-b:a', '192k',
-                        #     '\\\\mistrysharenas.localdomain\\Church\\Next Gen\\Next Gen Peace Cup\\2025-11-23\\MainCam\\oop.mp4'
-                        # ]
+                        commandString = f"ffmpeg -n -ss {timeStart} -i {titleOfVideoFile} -t {timeDifference.seconds} -c:v {encoder} -preset slow -c:a aac {titleOfOutputFile}"
+
                         tmpCommand = commandString.split(" ")
 
                         print(commandString)
